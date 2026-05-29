@@ -36,8 +36,8 @@ test.describe('Chat', () => {
     await typeIntoInput(page, 'Hello world');
     await page.getByTestId('send-button').click();
 
-    await expect(page.getByText('Hello world')).toBeVisible();
-    await expect(page.getByText('You said: "Hello world"')).toBeVisible();
+    await expect(page.getByText('Hello world', { exact: true })).toBeVisible();
+    await expect(page.getByText('You said: "Hello world"', { exact: true })).toBeVisible();
   });
 
   test('input is cleared after sending', async ({ page }) => {
@@ -49,7 +49,7 @@ test.describe('Chat', () => {
   test('sends a message with the Enter key', async ({ page }) => {
     await typeIntoInput(page, 'Enter key test');
     await page.keyboard.press('Enter');
-    await expect(page.getByText('Enter key test')).toBeVisible();
+    await expect(page.getByText('Enter key test', { exact: true })).toBeVisible();
   });
 
   test('Shift+Enter adds a new line instead of sending', async ({ page }) => {

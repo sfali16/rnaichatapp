@@ -45,7 +45,7 @@ test.describe('Sessions', () => {
     await page.getByTestId('session-selector').click();
     await page.getByTestId('session-item-0').click();
 
-    await expect(page.getByText('From session 1')).toBeVisible();
+    await expect(page.getByText('From session 1', { exact: true })).toBeVisible();
   });
 
   test('session dropdown lists all sessions', async ({ page }) => {
