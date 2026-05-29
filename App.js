@@ -219,6 +219,7 @@ export default function App() {
                   <View key={session.id}>
                     {index > 0 && <View style={styles.menuDivider} />}
                     <TouchableOpacity
+                      testID={`session-item-${index}`}
                       style={styles.sessionItem}
                       onPress={() => switchSession(session.id)}
                     >

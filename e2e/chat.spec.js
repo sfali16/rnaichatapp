@@ -1,9 +1,16 @@
 const { test, expect } = require('@playwright/test');
 
+// React Native Web's controlled TextInput needs real keystroke events to
+// update React state. Use pressSequentially() instead of fill() so that
+// onChangeText fires correctly on every character.
+async function typeIntoInput(page, text) {
+  await page.getByTestId('chat-input').click();
+  await page.getByTestId('chat-input').pressSequentially(text);
+}
+
 test.describe('Chat', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    // wait for the app to be ready
     await page.getByTestId('chat-input').waitFor();
   });
 
@@ -17,13 +24,13 @@ test.describe('Chat', () => {
   });
 
   test('Send button enables when input has text', async ({ page }) => {
-    await page.getByTestId('chat-input').fill('hello');
+    await typeIntoInput(page, 'hello');
     const send = page.getByTestId('send-button');
     await expect(send).not.toHaveAttribute('aria-disabled', 'true');
   });
 
   test('sends a message by clicking Send', async ({ page }) => {
-    await page.getByTestId('chat-input').fill('Hello world');
+    await typeIntoInput(page, 'Hello world');
     await page.getByTestId('send-button').click();
 
     await expect(page.getByText('Hello world')).toBeVisible();
@@ -31,35 +38,33 @@ test.describe('Chat', () => {
   });
 
   test('input is cleared after sending', async ({ page }) => {
-    const input = page.getByTestId('chat-input');
-    await input.fill('Clear me');
+    await typeIntoInput(page, 'Clear me');
     await page.getByTestId('send-button').click();
-    await expect(input).toHaveValue('');
+    await expect(page.getByTestId('chat-input')).toHaveValue('');
   });
 
   test('sends a message with the Enter key', async ({ page }) => {
-    await page.getByTestId('chat-input').fill('Enter key test');
+    await typeIntoInput(page, 'Enter key test');
     await page.keyboard.press('Enter');
     await expect(page.getByText('Enter key test')).toBeVisible();
   });
 
   test('Shift+Enter adds a new line instead of sending', async ({ page }) => {
-    const input = page.getByTestId('chat-input');
-    await input.fill('Line one');
+    await typeIntoInput(page, 'Line one');
     await page.keyboard.press('Shift+Enter');
-    await input.type('Line two');
+    await page.getByTestId('chat-input').pressSequentially('Line two');
 
     // message count should still be 1 (just the welcome message)
     await expect(page.getByTestId('message-bubble')).toHaveCount(1);
   });
 
   test('each sent message creates two bubbles (sent + echo)', async ({ page }) => {
-    await page.getByTestId('chat-input').fill('First');
+    await typeIntoInput(page, 'First');
     await page.getByTestId('send-button').click();
     // 1 welcome + 1 sent + 1 echo = 3
     await expect(page.getByTestId('message-bubble')).toHaveCount(3);
 
-    await page.getByTestId('chat-input').fill('Second');
+    await typeIntoInput(page, 'Second');
     await page.getByTestId('send-button').click();
     // + 2 more = 5
     await expect(page.getByTestId('message-bubble')).toHaveCount(5);
