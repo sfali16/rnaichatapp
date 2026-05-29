@@ -1,11 +1,14 @@
 const { test, expect } = require('@playwright/test');
 
-// React Native Web's controlled TextInput needs real keystroke events to
-// update React state. Use pressSequentially() instead of fill() so that
-// onChangeText fires correctly on every character.
+// getByTestId('chat-input') may resolve to a wrapper div in React Native Web,
+// so keystrokes never reach the underlying <textarea>. Target the textarea
+// directly via its ARIA role, then wait for the value to confirm React state
+// has updated before the test proceeds.
 async function typeIntoInput(page, text) {
-  await page.getByTestId('chat-input').click();
-  await page.getByTestId('chat-input').pressSequentially(text);
+  const input = page.getByRole('textbox');
+  await input.click();
+  await input.pressSequentially(text);
+  await expect(input).toHaveValue(text);
 }
 
 test.describe('Chat', () => {

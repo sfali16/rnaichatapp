@@ -1,9 +1,11 @@
 const { test, expect } = require('@playwright/test');
 
-// See chat.spec.js for why pressSequentially is used instead of fill()
+// See chat.spec.js for why getByRole('textbox') is used instead of testID
 async function typeIntoInput(page, text) {
-  await page.getByTestId('chat-input').click();
-  await page.getByTestId('chat-input').pressSequentially(text);
+  const input = page.getByRole('textbox');
+  await input.click();
+  await input.pressSequentially(text);
+  await expect(input).toHaveValue(text);
 }
 
 test.describe('Sessions', () => {
