@@ -3,7 +3,6 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -35,7 +34,6 @@ export default function App() {
   const [attachMenuVisible, setAttachMenuVisible] = useState(false);
   const [sessionsMenuVisible, setSessionsMenuVisible] = useState(false);
   const [headerSize, setHeaderSize] = useState('small');
-  const [headerHeight, setHeaderHeight] = useState(0);
   const listRef = useRef(null);
 
   const currentSession = sessions.find(s => s.id === currentSessionId);
@@ -84,10 +82,7 @@ export default function App() {
       <StatusBar style="dark" />
 
       {/* ── header ────────────────────────────────────────────────────────── */}
-      <View
-        style={[styles.header, { paddingVertical: HEADER_PADDING[headerSize] }]}
-        onLayout={e => setHeaderHeight(e.nativeEvent.layout.height)}
-      >
+      <View style={[styles.header, { paddingVertical: HEADER_PADDING[headerSize] }]}>
         {/* session picker */}
         <TouchableOpacity
           style={styles.sessionSelector}
