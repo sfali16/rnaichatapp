@@ -34,6 +34,7 @@ export default function App() {
   const [attachMenuVisible, setAttachMenuVisible] = useState(false);
   const [sessionsMenuVisible, setSessionsMenuVisible] = useState(false);
   const [headerSize, setHeaderSize] = useState('small');
+  const [headerHeight, setHeaderHeight] = useState(0);
   const listRef = useRef(null);
 
   const currentSession = sessions.find(s => s.id === currentSessionId);
@@ -82,9 +83,18 @@ export default function App() {
       <StatusBar style="dark" />
 
       {/* ── header ────────────────────────────────────────────────────────── */}
-      <View style={[styles.header, { paddingVertical: HEADER_PADDING[headerSize] }]}>
+      <View
+        testID="header"
+        style={[styles.header, { paddingVertical: HEADER_PADDING[headerSize] }]}
+        onLayout={e => {
+          const h = e.nativeEvent.layout.height;
+          setHeaderHeight(h);
+          console.log(`[header] size=${headerSize} measuredHeight=${h} keyboardVerticalOffset=0`);
+        }}
+      >
         {/* session picker */}
         <TouchableOpacity
+          testID="session-selector"
           style={styles.sessionSelector}
           onPress={() => setSessionsMenuVisible(true)}
         >
@@ -97,6 +107,7 @@ export default function App() {
           {['small', 'medium', 'large'].map(size => (
             <TouchableOpacity
               key={size}
+              testID={`size-${size}`}
               style={[styles.sizeButton, headerSize === size && styles.sizeButtonActive]}
               onPress={() => setHeaderSize(size)}
             >
@@ -108,7 +119,7 @@ export default function App() {
         </View>
 
         {/* new session button */}
-        <TouchableOpacity style={styles.newButton} onPress={createNewSession}>
+        <TouchableOpacity testID="new-session-button" style={styles.newButton} onPress={createNewSession}>
           <Text style={styles.newButtonText}>New</Text>
         </TouchableOpacity>
       </View>
@@ -158,6 +169,7 @@ export default function App() {
         <View style={styles.inputRow}>
           <View style={styles.inputContainer}>
             <TextInput
+              testID="chat-input"
               style={styles.input}
               value={inputText}
               onChangeText={setInputText}
@@ -174,10 +186,11 @@ export default function App() {
               }}
             />
             <View style={styles.inputToolbar}>
-              <TouchableOpacity style={styles.plusButton} onPress={() => setAttachMenuVisible(true)}>
+              <TouchableOpacity testID="plus-button" style={styles.plusButton} onPress={() => setAttachMenuVisible(true)}>
                 <Text style={styles.plusButtonText}>+</Text>
               </TouchableOpacity>
               <TouchableOpacity
+                testID="send-button"
                 style={[styles.sendButton, !inputText.trim() && styles.sendButtonDisabled]}
                 onPress={sendMessage}
                 disabled={!inputText.trim()}
@@ -206,6 +219,7 @@ export default function App() {
                   <View key={session.id}>
                     {index > 0 && <View style={styles.menuDivider} />}
                     <TouchableOpacity
+                      testID={`session-item-${index}`}
                       style={styles.sessionItem}
                       onPress={() => switchSession(session.id)}
                     >
@@ -235,7 +249,7 @@ export default function App() {
 
 function MessageBubble({ message }) {
   return (
-    <View style={[styles.bubbleWrapper, message.fromMe ? styles.bubbleRight : styles.bubbleLeft]}>
+    <View testID="message-bubble" style={[styles.bubbleWrapper, message.fromMe ? styles.bubbleRight : styles.bubbleLeft]}>
       <View style={[styles.bubble, message.fromMe ? styles.bubbleMe : styles.bubbleThem]}>
         <Text selectable style={[styles.bubbleText, message.fromMe && styles.bubbleTextMe]}>
           {message.text}
