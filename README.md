@@ -136,14 +136,71 @@ Open the **Camera app** on your phone and point it at the QR code. Tap the notif
 
 ---
 
+---
+
+## E2E Tests (Playwright — Web)
+
+The test suite uses [Playwright](https://playwright.dev) and runs against the web version of the app.
+
+### Step 1 — Install Playwright and its browsers
+
+```bash
+npx playwright install --with-deps chromium
+```
+
+This downloads Chromium and any system dependencies it needs. Only needs to be run once.
+
+### Step 2 — Start the web server
+
+Open a terminal and start the app:
+
+```bash
+export PATH="/c/dev/nodejs:$PATH"
+npm run web
+```
+
+Leave this running and open a second terminal for the next step.
+
+### Step 3 — Run the tests
+
+```bash
+export PATH="/c/dev/nodejs:$PATH"
+npm run test:e2e
+```
+
+Chromium will open and you will see the tests execute in the browser. Results are printed in the terminal when done. Screenshots and video are saved to `test-results/` for any failing test.
+
+### Visual UI mode
+
+For a more interactive experience — step through each test action with a timeline, screenshots, and DOM snapshots:
+
+```bash
+npm run test:e2e:ui
+```
+
+### What is tested
+
+| Suite | Covers |
+|---|---|
+| `e2e/chat.spec.js` | Sending messages via button and Enter key, Shift+Enter newline, input cleared after send, bubble count |
+| `e2e/sessions.spec.js` | Create sessions, switch between them, history preserved, dropdown list, active checkmark, backdrop dismiss |
+| `e2e/header.spec.js` | S/M/L header height changes, active button highlight |
+
+---
+
 ## Project Structure
 
 ```
 RNAIChatApp/
-├── App.js          # Entire app — components, state, styles
-├── app.json        # Expo configuration (name, icons, splash)
-├── package.json    # Dependencies and npm scripts
-└── assets/         # App icons and splash screen images
+├── App.js              # Entire app — components, state, styles
+├── app.json            # Expo configuration (name, icons, splash)
+├── package.json        # Dependencies and npm scripts
+├── playwright.config.js # Playwright configuration
+├── e2e/                # Playwright test suites
+│   ├── chat.spec.js
+│   ├── sessions.spec.js
+│   └── header.spec.js
+└── assets/             # App icons and splash screen images
 ```
 
 ## Available Scripts
@@ -153,3 +210,5 @@ RNAIChatApp/
 | `npm run web` | Run in the browser at localhost:8081 |
 | `npm run android` | Build and launch on a connected emulator or device |
 | `npx expo start` | Start the dev server and show QR code for Expo Go |
+| `npm run test:e2e` | Run Playwright tests against the web app |
+| `npm run test:e2e:ui` | Open the Playwright visual test runner |
